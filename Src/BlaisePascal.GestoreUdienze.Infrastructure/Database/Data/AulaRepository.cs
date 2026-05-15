@@ -19,13 +19,7 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             @"
             CREATE TABLE IF NOT EXISTS Aule (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Nome TEXT,
-                NomeProfessore1 TEXT,
-                CognomeProfessore1 TEXT,
-                NomeProfessore2 TEXT,
-                CognomeProfessore2 TEXT,
-                FOREIGN KEY (NomeProfessore1, CognomeProfessore1) REFERENCES Professori(Nome, Cognome),
-                FOREIGN KEY (NomeProfessore2, CognomeProfessore2) REFERENCES Professori(Nome, Cognome)
+                Nome TEXT
             );
             ";
             command.ExecuteNonQuery();
@@ -49,11 +43,7 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
                 return new Aula
                 {
                     Id = reader.GetInt32(0),
-                    Nome = reader.GetString(1),
-                    NomeProfessore1 = reader.GetString(2),
-                    CognomeProfessore1 = reader.GetString(3),
-                    NomeProfessore2 = reader.GetString(4),
-                    CognomeProfessore2 = reader.GetString(5)
+                    Nome = reader.GetString(1)
                 };
             }
             return null;
@@ -80,16 +70,12 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
                 command.CommandText =
                 @"
                 INSERT INTO Aule
-                (Nome, NomeProfessore1, CognomeProfessore1, NomeProfessore2, CognomeProfessore2)
+                (Nome)
                 VALUES
-                (@nome, @nomeProf1, @cognomeProf1, @nomeProf2, @cognomeProf2)
+                (@nome)
                 ";
 
                 command.Parameters.AddWithValue("@nome", a.Nome ?? string.Empty);
-                command.Parameters.AddWithValue("@nomeProf1", a.NomeProfessore1 ?? string.Empty);
-                command.Parameters.AddWithValue("@cognomeProf1", a.CognomeProfessore1 ?? string.Empty);
-                command.Parameters.AddWithValue("@nomeProf2", a.NomeProfessore2 ?? string.Empty);
-                command.Parameters.AddWithValue("@cognomeProf2", a.CognomeProfessore2 ?? string.Empty);
 
                 command.ExecuteNonQuery();
             }

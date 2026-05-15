@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
 {
-    public static class ClasseRepository
+    public static class MateriaRepository
     {
         private static string connectionString = "Data Source=gestoreudienze.db";
 
@@ -17,9 +17,9 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             var command = connection.CreateCommand();
             command.CommandText =
             @"
-            CREATE TABLE IF NOT EXISTS Classi (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Nome TEXT,
+            CREATE TABLE IF NOT EXISTS Materie (
+                CodiceMateria TEXT PRIMARY KEY,
+                NomeMateria TEXT,
                 CodiceProfessore TEXT,
                 FOREIGN KEY (CodiceProfessore) REFERENCES Professori(CodiceProfessore)
             );
@@ -27,7 +27,7 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             command.ExecuteNonQuery();
         }
 
-        public static Classe LeggiClasse(int id)
+        public static Materia LeggiMateria(string codiceMateria)
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();
@@ -35,17 +35,17 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             var command = connection.CreateCommand();
             command.CommandText =
             @"
-            SELECT * FROM Classi WHERE Id = @id
+            SELECT * FROM Materie WHERE CodiceMateria = @codiceMateria
             ";
-            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@codiceMateria", codiceMateria);
 
             var reader = command.ExecuteReader();
             if (reader.Read())
             {
-                return new Classe
+                return new Materia
                 {
-                    Id = reader.GetInt32(0),
-                    Nome = reader.GetString(1),
+                    CodiceMateria = reader.GetString(0),
+                    NomeMateria = reader.GetString(1),
                     CodiceProfessore = reader.GetString(2)
                 };
             }
@@ -58,28 +58,29 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             connection.Open();
 
             var command = connection.CreateCommand();
-            command.CommandText = "DELETE FROM Classi;";
+            command.CommandText = "DELETE FROM Materie;";
             command.ExecuteNonQuery();
         }
 
-        public static void SalvaClassi(List<Classe> classi)
+        public static void SalvaMaterie(List<Materia> materie)
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();
 
-            foreach (var c in classi)
+            foreach (var m in materie)
             {
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                INSERT INTO Classi
-                (Nome, CodiceProfessore)
+                INSERT INTO Materie
+                (CodiceMateria, NomeMateria, CodiceProfessore)
                 VALUES
-                (@nome, @codiceProfessore)
+                (@codiceMateria, @nomeMateria, @codiceProfessore)
                 ";
 
-                command.Parameters.AddWithValue("@nome", c.Nome ?? string.Empty);
-                command.Parameters.AddWithValue("@codiceProfessore", c.CodiceProfessore ?? string.Empty);
+                command.Parameters.AddWithValue("@codiceMateria", m.CodiceMateria ?? string.Empty);
+                command.Parameters.AddWithValue("@nomeMateria", m.NomeMateria ?? string.Empty);
+                command.Parameters.AddWithValue("@codiceProfessore", m.CodiceProfessore ?? string.Empty);
 
                 command.ExecuteNonQuery();
             }
