@@ -10,19 +10,22 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.DatabaseInitialize
             ProfessoreRepository.CreaTabella();
             AulaRepository.CreaTabella();
             ClasseRepository.CreaTabella();
+            MateriaRepository.CreaTabella();
             OrarioTurniRepository.CreaTabella();
 
             // FASE 2: SVUOTAMENTO TABELLE (ORDINE INVERSO! Prima i figli, poi il padre)
-            AulaRepository.SvuotaTabella();
             OrarioTurniRepository.SvuotaTabella();
+            MateriaRepository.SvuotaTabella();
             ClasseRepository.SvuotaTabella();
-            ProfessoreRepository.SvuotaTabella(); // Il professore si svuota PER ULTIMO perché Aule e OrarioTurni hanno FK che puntano a Professori
+            AulaRepository.SvuotaTabella();
+            ProfessoreRepository.SvuotaTabella(); // Il professore si svuota PER ULTIMO perché Classi e Materie hanno FK che puntano a Professori
 
             // FASE 3: SALVATAGGIO DATI (Usa "dati." invece di "DatiImportatiDto.")
             // ORDINE CORRETTO: Prima il padre, poi i figli
             ProfessoreRepository.SalvaProfessori(DatiImportatiDto.Professori);
             AulaRepository.SalvaAule(DatiImportatiDto.Aule);
             ClasseRepository.SalvaClassi(DatiImportatiDto.Classi);
+            MateriaRepository.SalvaMaterie(DatiImportatiDto.Materie);
             OrarioTurniRepository.SalvaOrarioTurni(DatiImportatiDto.OrariTurni);
         }
 

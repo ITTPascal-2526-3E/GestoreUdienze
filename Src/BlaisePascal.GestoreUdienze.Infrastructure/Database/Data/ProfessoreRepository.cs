@@ -18,16 +18,15 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             command.CommandText =
             @"
             CREATE TABLE IF NOT EXISTS Professori (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                CodiceProfessore TEXT PRIMARY KEY,
                 Nome TEXT,
-                Cognome TEXT,
-                UNIQUE(Nome, Cognome)
+                Cognome TEXT
             );
             ";
             command.ExecuteNonQuery();
         }
 
-        public static Professore LeggiProfessore(int id)
+        public static Professore LeggiProfessore(string codiceProfessore)
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();
@@ -35,16 +34,16 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             var command = connection.CreateCommand();
             command.CommandText =
             @"
-            SELECT * FROM Professori WHERE Id = @id
+            SELECT * FROM Professori WHERE CodiceProfessore = @codiceProfessore
             ";
-            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@codiceProfessore", codiceProfessore);
 
             var reader = command.ExecuteReader();
             if (reader.Read())
             {
                 return new Professore
                 {
-                    Id = reader.GetInt32(0),
+                    CodiceProfessore = reader.GetString(0),
                     Nome = reader.GetString(1),
                     Cognome = reader.GetString(2)
                 };
@@ -73,11 +72,12 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
                 command.CommandText =
                 @"
                 INSERT INTO Professori
-                (Nome, Cognome)
+                (CodiceProfessore, Nome, Cognome)
                 VALUES
-                (@nome, @cognome)
+                (@codiceProfessore, @nome, @cognome)
                 ";
 
+                command.Parameters.AddWithValue("@codiceProfessore", p.CodiceProfessore ?? string.Empty);
                 command.Parameters.AddWithValue("@nome", p.Nome ?? string.Empty);
                 command.Parameters.AddWithValue("@cognome", p.Cognome ?? string.Empty);
 
