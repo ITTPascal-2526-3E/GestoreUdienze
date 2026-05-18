@@ -23,7 +23,7 @@ namespace BlaisePascal.GestoreUdienze.Wpf
 
             // 2. Popola Classi (Dalla 1A alla 5N + BIO)
             List<string> classi = new List<string>();
-            char[] sezioni = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N' };
+            char[] sezioni = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'L', 'M', 'N' };
 
             for (int anno = 1; anno <= 5; anno++)
             {
