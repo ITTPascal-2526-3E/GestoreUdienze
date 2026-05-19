@@ -2,18 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.Win32;
 
 namespace BlaisePascal.GestoreUdienze.Wpf
 {
-    /// <summary>
-    /// Logica di interazione per MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        // Variabile per memorizzare il percorso del file di dati caricato (es. Excel, CSV, JSON)
         private string _caricatoFilePath = string.Empty;
+        private string _caricatoPdfPath = string.Empty;
 
         public MainWindow()
         {
@@ -22,32 +18,27 @@ namespace BlaisePascal.GestoreUdienze.Wpf
             InizializzaInterfaccia();
         }
 
-        /// <summary>
-        /// Inizializza i componenti dell'interfaccia grafica prima del caricamento del file.
-        /// </summary>
         private void InizializzaInterfaccia()
         {
             DatePickerGiornata.SelectedDate = DateTime.Now;
 
-            // Disabilita i controlli finché non viene caricato un file valido
-            SetStatoControlli(false);
+            // Carica subito i dati di prova nelle liste
+            PopolaListeDaFile(string.Empty);
+
+            // Attiva i controlli
+            SetStatoControlli(true);
         }
 
-        /// <summary>
-        /// Sottoscrizione degli eventi dei controlli XAML.
-        /// </summary>
         private void AssegnaEventi()
         {
             BtnBrowse.Click += BtnBrowse_Click;
+            BtnBrowsePdf.Click += BtnBrowsePdf_Click; // Nuovo evento associato
             BtnStampaGiornata.Click += BtnStampaGiornata_Click;
             BtnStampaAule.Click += BtnStampaAule_Click;
             BtnStampaClassi.Click += BtnStampaClassi_Click;
             BtnGenera.Click += BtnGenera_Click;
         }
 
-        /// <summary>
-        /// Gestisce l'abilitazione dei pulsanti di stampa e generazione in base alla presenza del file.
-        /// </summary>
         private void SetStatoControlli(bool isAbilitato)
         {
             DatePickerGiornata.IsEnabled = isAbilitato;
@@ -60,17 +51,13 @@ namespace BlaisePascal.GestoreUdienze.Wpf
             BtnGenera.IsEnabled = isAbilitato;
         }
 
-        #region Logica di Caricamento Dati
-
-        /// <summary>
-        /// Evento per la selezione del file sorgente tramite OpenFileDialog.
-        /// </summary>
+        // 1. Sfoglia File Dati (Excel / CSV)
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Title = "Seleziona il file dei dati delle udienze",
-                Filter = "File Excel (*.xlsx;*.xls)|*.xlsx;*.xls|File CSV (*.csv)|*.csv|Tutti i file (*.*)|*.*",
+                Filter = "File Excel (*.xlsx;*.xls)|*.xlsx;*.xls|File CSV (*.csv)|*.csv",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
@@ -83,41 +70,77 @@ namespace BlaisePascal.GestoreUdienze.Wpf
 
                 try
                 {
-                    // Metodo per estrarre i dati dal file e popolare le liste
                     PopolaListeDaFile(_caricatoFilePath);
                     SetStatoControlli(true);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Errore durante la lettura del file: {ex.Message}", "Errore di Caricamento", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Errore durante la lettura del file dati: {ex.Message}", "Errore di Caricamento", MessageBoxButton.OK, MessageBoxImage.Error);
                     SetStatoControlli(false);
                 }
             }
         }
 
-        /// <summary>
-        /// Legge il file e popola i ListBox delle Aule e delle Classi.
-        /// </summary>
-        private void PopolaListeDaFile(string filePath)
+        // 2. Sfoglia File PDF (Nuovo)
+        private void BtnBrowsePdf_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Inserire qui la logica reale di parsing del file (es. tramite Librerie Excel come EPPlus o ClosedXML)
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = "Seleziona il file verbale PDF",
+                Filter = "Documenti PDF (*.pdf)|*.pdf", // Accetta solo file PDF
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
 
-            // Simulazione dati di esempio:
-            List<string> auleEsempio = new List<string> { "Aula 1", "Aula 2", "Aula 3", "Aula Magna", "Laboratorio Info" };
-            List<string> classiEsempio = new List<string> { "1A", "2A", "3B", "4C", "5B" };
+            if (openFileDialog.ShowDialog() == true)
+            {
+                _caricatoPdfPath = openFileDialog.FileName;
+                TxtPdfPath.Text = Path.GetFileName(_caricatoPdfPath);
+                TxtPdfPath.Foreground = System.Windows.Media.Brushes.Black;
 
-            // Assegnazione dei dati alle liste dell'interfaccia
-            ListAule.ItemsSource = auleEsempio;
-            ListClassi.ItemsSource = classiEsempio;
+                // Opzionale: notifica visiva o logica aggiuntiva legata al PDF caricato
+            }
         }
 
-        #endregion
+        private void PopolaListeDaFile(string filePath)
+        {
+            // -----------------------------------------
+            // 1. GENERAZIONE AUTOMATICA DELLE 50 AULE
+            // -----------------------------------------
+            List<string> auleGenerate = new List<string>();
+            for (int i = 1; i <= 50; i++)
+            {
+                auleGenerate.Add($"Aula {i}");
+            }
 
-        #region Eventi di Stampa e Generazione
+            // -----------------------------------------
+            // 2. GENERAZIONE AUTOMATICA DELLE CLASSI
+            // -----------------------------------------
+            List<string> classiGenerate = new List<string>();
 
-        /// <summary>
-        /// Stampa il prospetto delle udienze relativo alla data selezionata.
-        /// </summary>
+            // Array delle sezioni dalla A alla N (senza lettere straniere J, K, W, X, Y)
+            string[] sezioni = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "L", "M", "N" };
+
+            // Ciclo per gli anni dalla 1° alla 5° classe
+            for (int anno = 1; anno <= 5; anno++)
+            {
+                // Genera le combinazioni standard (es. 1A, 1B ... 5N)
+                foreach (string sezione in sezioni)
+                {
+                    classiGenerate.Add($"{anno}{sezione}");
+                }
+
+                // Aggiunge la sezione speciale "BIO" per ogni anno (es. 1BIO, 2BIO ... 5BIO)
+                classiGenerate.Add($"{anno}BIO");
+            }
+
+            // -----------------------------------------
+            // 3. ASSEGNAZIONE DEI DATI AI CONTROLLI XAML
+            // -----------------------------------------
+            ListAule.ItemsSource = auleGenerate;
+            ListClassi.ItemsSource = classiGenerate;
+        }
+
         private void BtnStampaGiornata_Click(object sender, RoutedEventArgs e)
         {
             DateTime? dataSelezionata = DatePickerGiornata.SelectedDate;
@@ -128,23 +151,14 @@ namespace BlaisePascal.GestoreUdienze.Wpf
             }
 
             string dataString = dataSelezionata.Value.ToShortDateString();
-
-            // TODO: Implementare la logica di esportazione/stampa per la giornata
             MessageBox.Show($"Generazione stampa per la giornata del: {dataString}", "Stampa Giornata", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        /// <summary>
-        /// Stampa il prospetto relativo alle aule selezionate tramite CheckBox.
-        /// </summary>
         private void BtnStampaAule_Click(object sender, RoutedEventArgs e)
         {
             List<string> auleSelezionate = new List<string>();
-
-            // Recupera gli elementi selezionati dal ListBox delle Aule
             foreach (var item in ListAule.Items)
             {
-                // Avendo abilitato la selezione multipla ed elementi con CheckBox, 
-                // è possibile verificare quali elementi sono stati spuntati o selezionati
                 if (ListAule.SelectedItems.Contains(item))
                 {
                     auleSelezionate.Add(item.ToString());
@@ -157,13 +171,9 @@ namespace BlaisePascal.GestoreUdienze.Wpf
                 return;
             }
 
-            // TODO: Implementare la logica di esportazione/stampa per le aule
             MessageBox.Show($"Generazione stampa per {auleSelezionate.Count} aule selezionate.", "Stampa Aule", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        /// <summary>
-        /// Stampa il prospetto relativo alla classe selezionata nel ListBox.
-        /// </summary>
         private void BtnStampaClassi_Click(object sender, RoutedEventArgs e)
         {
             if (ListClassi.SelectedItem == null)
@@ -173,21 +183,27 @@ namespace BlaisePascal.GestoreUdienze.Wpf
             }
 
             string classeSelezionata = ListClassi.SelectedItem.ToString();
-
-            // TODO: Implementare la logica di esportazione/stampa per la classe
             MessageBox.Show($"Generazione stampa per la classe: {classeSelezionata}", "Stampa Classi", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        /// <summary>
-        /// Esegue la generazione complessiva di tutto il sistema delle udienze.
-        /// </summary>
         private void BtnGenera_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Inserire la logica di elaborazione massiva finale
+            if (string.IsNullOrEmpty(_caricatoPdfPath))
+            {
+                MessageBox.Show("Attenzione: nessun file PDF selezionato. Procedere comunque?", "Verifica Documento", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            }
 
             MessageBox.Show("Elaborazione generale avviata con successo ed esportazione dei registri in corso.", "Elaborazione Generale", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        #endregion
+        private void TxtPdfPath_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
+        }
+
+        private void BtnBrowse_Click_1(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
