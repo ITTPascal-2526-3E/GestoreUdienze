@@ -98,45 +98,33 @@ namespace BlaisePascal.GestoreUdienze.Wpf
                 TxtPdfPath.Text = Path.GetFileName(_caricatoPdfPath);
                 TxtPdfPath.Foreground = System.Windows.Media.Brushes.Black;
 
-                // Opzionale: notifica visiva o logica aggiuntiva legata al PDF caricato
             }
         }
 
         private void PopolaListeDaFile(string filePath)
         {
-            // -----------------------------------------
-            // 1. GENERAZIONE AUTOMATICA DELLE 50 AULE
-            // -----------------------------------------
             List<string> auleGenerate = new List<string>();
             for (int i = 1; i <= 50; i++)
             {
                 auleGenerate.Add($"Aula {i}");
-            }
+            } 
 
-            // -----------------------------------------
-            // 2. GENERAZIONE AUTOMATICA DELLE CLASSI
-            // -----------------------------------------
             List<string> classiGenerate = new List<string>();
 
-            // Array delle sezioni dalla A alla N (senza lettere straniere J, K, W, X, Y)
             string[] sezioni = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "L", "M", "N" };
 
-            // Ciclo per gli anni dalla 1° alla 5° classe
+
             for (int anno = 1; anno <= 5; anno++)
             {
-                // Genera le combinazioni standard (es. 1A, 1B ... 5N)
+
                 foreach (string sezione in sezioni)
                 {
                     classiGenerate.Add($"{anno}{sezione}");
                 }
 
-                // Aggiunge la sezione speciale "BIO" per ogni anno (es. 1BIO, 2BIO ... 5BIO)
                 classiGenerate.Add($"{anno}BIO");
             }
-
-            // -----------------------------------------
-            // 3. ASSEGNAZIONE DEI DATI AI CONTROLLI XAML
-            // -----------------------------------------
+           
             ListAule.ItemsSource = auleGenerate;
             ListClassi.ItemsSource = classiGenerate;
         }
@@ -186,14 +174,46 @@ namespace BlaisePascal.GestoreUdienze.Wpf
             MessageBox.Show($"Generazione stampa per la classe: {classeSelezionata}", "Stampa Classi", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void BtnGenera_Click(object sender, RoutedEventArgs e)
+        private async void BtnGenera_Click(object sender, RoutedEventArgs e)
         {
+            // 1. Controllo preliminare sul PDF
             if (string.IsNullOrEmpty(_caricatoPdfPath))
             {
-                MessageBox.Show("Attenzione: nessun file PDF selezionato. Procedere comunque?", "Verifica Documento", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxResult result = MessageBox.Show("Attenzione: nessun file PDF selezionato. Procedere comunque?", "Verifica Documento", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.No)
+                {
+                    return;
+                }
             }
 
+            // 2. Prepariamo l'interfaccia per il caricamento
+            BtnGenera.IsEnabled = false;            // Disabilitiamo il pulsante per evitare click doppi
+            PanelLoading.Visibility = Visibility.Visible; // Mostriamo la barra di caricamento
+            ProgressBarGenera.Value = 0;            // Resettiamo il valore iniziale
+            TxtPercentuale.Text = "0%";
+
+            // 3. Simulazione del calcolo/avanzamento reale dell'elaborazione
+            // (Puoi sostituire questo ciclo con i tuoi passaggi di esportazione reali)
+            int stepTotali = 100;
+            for (int i = 1; i <= stepTotali; i++)
+            {
+                // Ritardo asincrono artificiale per simulare il lavoro del computer (es. 30 millisecondi a step)
+                await System.Threading.Tasks.Task.Delay(30);
+
+                // Calcolo della percentuale matematica progressiva
+                double percentuale = ((double)i / stepTotali) * 100;
+
+                // Aggiorniamo i controlli grafici in tempo reale
+                ProgressBarGenera.Value = percentuale;
+                TxtPercentuale.Text = $"{(int)percentuale}%";
+            }
+
+            // 4. Elaborazione completata con successo
             MessageBox.Show("Elaborazione generale avviata con successo ed esportazione dei registri in corso.", "Elaborazione Generale", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            // 5. Ripristiniamo l'interfaccia allo stato iniziale
+            PanelLoading.Visibility = Visibility.Collapsed; // Nascondiamo di nuovo la barra
+            BtnGenera.IsEnabled = true;                    // Riabilitiamo il pulsante
         }
 
         private void TxtPdfPath_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

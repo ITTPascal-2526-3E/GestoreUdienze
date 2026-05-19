@@ -94,7 +94,7 @@
                                      Foreground="#64748b" VerticalContentAlignment="Center" MinHeight="42" />
                         </Border>
                         <Button x:Name="BtnBrowse" Grid.Column="1" Content="Sfoglia" Width="100" Margin="12,0,0,0" 
-                                Style="{StaticResource PrimaryButton}" MinHeight="42" Click="BtnBrowse_Click_1" />
+                                Style="{StaticResource PrimaryButton}" MinHeight="42" />
                     </Grid>
 
                     <Grid Grid.Row="1" Margin="0,0,0,20">
@@ -104,10 +104,10 @@
                         </Grid.ColumnDefinitions>
                         <Border Background="#f8fafc" BorderBrush="#cbd5e1" BorderThickness="1" CornerRadius="8">
                             <TextBox x:Name="TxtPdfPath" IsReadOnly="True" Padding="12,0" FontSize="13" 
-                                     Text="Seleziona file dati (PDF)...&#xD;&#xA;" Background="Transparent" BorderThickness="0" 
-                                     Foreground="#64748b" VerticalContentAlignment="Center" MinHeight="42" TextChanged="TxtPdfPath_TextChanged" />
+                                     Text="Seleziona file dati (PDF)..." Background="Transparent" BorderThickness="0" 
+                                     Foreground="#64748b" VerticalContentAlignment="Center" MinHeight="42" />
                         </Border>
-                        <Button x:Name="BtnBrowsePdf" Grid.Column="1" Content="Sfoglia " Width="100" Margin="12,0,0,0" 
+                        <Button x:Name="BtnBrowsePdf" Grid.Column="1" Content="Sfoglia" Width="100" Margin="12,0,0,0" 
                                 Style="{StaticResource PrimaryButton}" MinHeight="42" />
                     </Grid>
 
@@ -166,6 +166,15 @@
 
                     <StackPanel Grid.Row="5">
                         <TextBlock Text="GENERALE" Style="{StaticResource SectionLabel}" Margin="0,0,0,16"/>
+
+                        <StackPanel x:Name="PanelLoading" Margin="0,0,0,16" Visibility="Collapsed">
+                            <Grid Margin="0,0,0,6">
+                                <TextBlock Text="Elaborazione in corso..." FontSize="13" Foreground="#475569" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="TxtPercentuale" Text="0%" FontSize="13" Foreground="#10b981" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <ProgressBar x:Name="ProgressBarGenera" Height="14" Minimum="0" Maximum="100" Value="0" Foreground="#10b981" Background="#e2e8f0" BorderThickness="0"/>
+                        </StackPanel>
+
                         <Button x:Name="BtnGenera" Content="GENERA" Background="#10b981" FontSize="16" FontWeight="Bold" Height="54" Style="{StaticResource PrimaryButton}"/>
                     </StackPanel>
 
