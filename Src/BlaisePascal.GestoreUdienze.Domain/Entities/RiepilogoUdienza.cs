@@ -1,4 +1,4 @@
-namespace BlaisePascal.GestoreUdienze.Domain.Models
+namespace BlaisePascal.GestoreUdienze.Domain.Entities
 {
     public class RiepilogoUdienza
     {

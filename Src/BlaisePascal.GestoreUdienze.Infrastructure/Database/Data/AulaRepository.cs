@@ -1,4 +1,4 @@
-using BlaisePascal.GestoreUdienze.Domain.Models;
+using BlaisePascal.GestoreUdienze.Domain.Entities;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;

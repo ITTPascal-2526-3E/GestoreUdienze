@@ -1,11 +1,18 @@
-namespace BlaisePascal.GestoreUdienze.Domain.Models
+namespace BlaisePascal.GestoreUdienze.Domain.Entities
 {
+    using System.Collections.Generic;
+
     public class Aula
     {
         public int Id { get; set; }
         public string Nome { get; set; } = string.Empty;
         public string Ala { get; set; } = string.Empty;
         public int Piano { get; set; }
+        
+        public string Plesso { get; set; } = string.Empty;
+        public int CapacitaMaterie { get; set; } = 2;
+        public List<string> AuleVicine { get; set; } = new List<string>();
+        public List<string> ClassiAssegnate { get; set; } = new List<string>();
 
         public Aula() { }
 
