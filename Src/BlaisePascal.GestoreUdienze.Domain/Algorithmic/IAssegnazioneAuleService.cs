@@ -1,7 +1,7 @@
-using BlaisePascal.GestoreUdienze.Domain.Entities;
+using BlaisePascal.GestoreUdienze.Domain.Models;
 using System.Collections.Generic;
 
-namespace BlaisePascal.GestoreUdienze.Domain.Interfaces
+namespace BlaisePascal.GestoreUdienze.Domain.Algorithmic
 {
     public interface IAssegnazioneAuleService
     {

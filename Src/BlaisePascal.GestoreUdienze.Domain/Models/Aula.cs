@@ -1,4 +1,4 @@
-namespace BlaisePascal.GestoreUdienze.Domain.Entities
+namespace BlaisePascal.GestoreUdienze.Domain.Models
 {
     using System.Collections.Generic;
 
@@ -11,7 +11,7 @@ namespace BlaisePascal.GestoreUdienze.Domain.Entities
         
         public string Plesso { get; set; } = string.Empty;
         public int CapacitaMaterie { get; set; } = 2;
-        public List<string> AuleVicine { get; set; } = new List<string>();
+        public List<int> AuleVicine { get; set; } = new List<int>();
         public List<string> ClassiAssegnate { get; set; } = new List<string>();
 
         public Aula() { }

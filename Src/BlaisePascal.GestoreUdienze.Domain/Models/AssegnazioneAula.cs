@@ -1,4 +1,4 @@
-namespace BlaisePascal.GestoreUdienze.Domain.Entities
+namespace BlaisePascal.GestoreUdienze.Domain.Models
 {
     public class AssegnazioneAula
     {
