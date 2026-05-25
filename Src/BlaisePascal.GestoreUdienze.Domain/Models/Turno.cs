@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace BlaisePascal.GestoreUdienze.Domain.Models
 {
     using System;
@@ -11,7 +17,7 @@ namespace BlaisePascal.GestoreUdienze.Domain.Models
         public int IndiceTurno { get; set; }      // 1–9 dentro la giornata
 
         /// <summary>Indice globale assoluto 1–36.</summary>
-        public int IndiceGlobale => (NumeroGiornata - 1) * 9 + IndiceTurno;
+        public int IndiceGlobale => (NumeroGiornata - 1) * 4 + IndiceTurno;
 
         public GruppoSezione Gruppo =>
             NumeroGiornata <= 2 ? GruppoSezione.Informatica : GruppoSezione.Automazione;
@@ -31,7 +37,7 @@ namespace BlaisePascal.GestoreUdienze.Domain.Models
         {
             if (numeroGiornata < 1 || numeroGiornata > 4)
                 throw new ArgumentOutOfRangeException(nameof(numeroGiornata));
-            if (indiceTurno < 1 || indiceTurno > 9)
+            if (indiceTurno < 1 || indiceTurno > 4)
                 throw new ArgumentOutOfRangeException(nameof(indiceTurno));
 
             NumeroGiornata = numeroGiornata;
