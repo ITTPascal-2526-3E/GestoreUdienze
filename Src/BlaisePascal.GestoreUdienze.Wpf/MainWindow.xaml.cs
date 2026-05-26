@@ -207,13 +207,20 @@ namespace BlaisePascal.GestoreUdienze.Wpf
             ListClassi.ItemsSource = classi;
         }
 
+        private static int GetNumericPart(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return int.MaxValue;
+            var digits = new string(input.Where(char.IsDigit).ToArray());
+            return int.TryParse(digits, out int val) ? val : int.MaxValue;
+        }
+
         private List<Aula> LeggiAuleDalDatabase()
         {
             var aule = new List<Aula>();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT Id, Nome, Ala, Piano FROM Aule ORDER BY Nome;";
+            cmd.CommandText = "SELECT Id, Nome, Ala, Piano FROM Aule;";
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -225,7 +232,7 @@ namespace BlaisePascal.GestoreUdienze.Wpf
                     Piano = reader.IsDBNull(3) ? 0 : reader.GetInt32(3)
                 });
             }
-            return aule;
+            return aule.OrderBy(a => GetNumericPart(a.Nome)).ThenBy(a => a.Nome).ToList();
         }
 
         private List<Classe> LeggiClassiDalDatabase()
@@ -234,7 +241,7 @@ namespace BlaisePascal.GestoreUdienze.Wpf
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT Id, Nome, CodiceProfessore FROM Classi ORDER BY Nome;";
+            cmd.CommandText = "SELECT Id, Nome, CodiceProfessore FROM Classi;";
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -249,7 +256,7 @@ namespace BlaisePascal.GestoreUdienze.Wpf
                 }
                 classi.Add(cl);
             }
-            return classi;
+            return classi.OrderBy(c => GetNumericPart(c.Nome)).ThenBy(c => c.Nome).ToList();
         }
 
         private List<Professore> LeggiProfessoriDalDatabase()
