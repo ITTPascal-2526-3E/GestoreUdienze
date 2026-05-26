@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +19,9 @@ namespace BlaisePascal.GestoreUdienze.Domain.Models
         public int Id { get; set; }
         public string Nome { get; set; } = string.Empty;      // es. "3L"
         public string CodiceProfessore { get; set; } = string.Empty;
+
+        // Lista di ID docenti che insegnano in questa classe
+        public List<string> DocentiIds { get; set; } = new();
 
         // Campi derivati dal Nome
         public int Anno { get; private set; }
@@ -68,4 +71,3 @@ namespace BlaisePascal.GestoreUdienze.Domain.Models
         public override int GetHashCode() => Nome.GetHashCode();
     }
 }
-
