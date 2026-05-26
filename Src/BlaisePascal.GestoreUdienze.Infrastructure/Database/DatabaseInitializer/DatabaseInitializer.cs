@@ -24,11 +24,13 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.DatabaseInitialize
             // ORDINE CORRETTO: Prima il padre, poi i figli
             // TODO: DatiImportatiDto non è presente nel progetto. Ripristinare quando sarà disponibile.
             
+            /*
             ProfessoreRepository.SalvaProfessori(DatiImportatiDto.Professori);
             AulaRepository.SalvaAule(DatiImportatiDto.Aule);
             ClasseRepository.SalvaClassi(DatiImportatiDto.Classi);
             MateriaRepository.SalvaMaterie(DatiImportatiDto.Materie);
             OrarioTurniRepository.SalvaOrarioTurni(DatiImportatiDto.OrariTurni);
+            */
             
         }
     }

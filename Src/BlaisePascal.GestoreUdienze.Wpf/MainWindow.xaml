@@ -140,7 +140,7 @@
                                 <ListBox x:Name="ListAule" Height="130" Margin="0,0,12,0" SelectionMode="Multiple">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <CheckBox Content="{Binding}" VerticalContentAlignment="Center" Padding="8,2"/>
+                                            <CheckBox Content="{Binding Nome}" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" VerticalContentAlignment="Center" Padding="8,2"/>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
