@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="8.6.0" />
     <PackageReference Include="Google.OrTools" Version="9.15.6755" />
     <PackageReference Include="QuestPDF" Version="2026.5.0" />
   </ItemGroup>
