@@ -27,7 +27,7 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             command.ExecuteNonQuery();
         }
 
-        public static Classe LeggiClasse(int id)
+        public static Classe? LeggiClasse(int id)
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();

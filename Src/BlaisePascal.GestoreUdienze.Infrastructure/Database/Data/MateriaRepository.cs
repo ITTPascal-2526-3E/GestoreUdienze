@@ -27,7 +27,7 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             command.ExecuteNonQuery();
         }
 
-        public static Materia LeggiMateria(string codiceMateria)
+        public static Materia? LeggiMateria(string codiceMateria)
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();

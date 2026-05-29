@@ -110,6 +110,18 @@ namespace BlaisePascal.GestoreUdienze.Wpf
                 cmd.ExecuteNonQuery();
             }
 
+            // Create ProfessoriClassi junction table
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS ProfessoriClassi (
+                    CodiceProfessore TEXT NOT NULL,
+                    ClasseNome TEXT NOT NULL,
+                    PRIMARY KEY (CodiceProfessore, ClasseNome)
+                );";
+                cmd.ExecuteNonQuery();
+            }
+
             // Create Materie
             using (var cmd = connection.CreateCommand())
             {
@@ -287,7 +299,7 @@ namespace BlaisePascal.GestoreUdienze.Wpf
             foreach (var p in professori)
             {
                 using var cmd = connection.CreateCommand();
-                cmd.CommandText = "SELECT Id, Nome FROM Classi WHERE CodiceProfessore = @codice;";
+                cmd.CommandText = "SELECT c.Id, c.Nome FROM Classi c INNER JOIN ProfessoriClassi pc ON c.Nome = pc.ClasseNome WHERE pc.CodiceProfessore = @codice;";
                 cmd.Parameters.AddWithValue("@codice", p.CodiceProfessore);
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
@@ -429,7 +441,7 @@ namespace BlaisePascal.GestoreUdienze.Wpf
                 // Svuota le tabelle in ordine di vincolo
                 using (var cmd = connection.CreateCommand())
                 {
-                    cmd.CommandText = "DELETE FROM OrarioTurni; DELETE FROM Materie; DELETE FROM Classi; DELETE FROM Professori;";
+                    cmd.CommandText = "DELETE FROM ProfessoriClassi; DELETE FROM OrarioTurni; DELETE FROM Materie; DELETE FROM Classi; DELETE FROM Professori;";
                     cmd.ExecuteNonQuery();
                 }
 
@@ -457,6 +469,21 @@ namespace BlaisePascal.GestoreUdienze.Wpf
                     cmd.Parameters.AddWithValue("@nome", c.Nome);
                     cmd.Parameters.AddWithValue("@codiceProfessore", c.CodiceProfessore);
                     cmd.ExecuteNonQuery();
+                }
+
+                // Inserimento ProfessoriClassi (junction table)
+                foreach (var p in professori)
+                {
+                    foreach (var cl in p.Classi)
+                    {
+                        using var cmd = connection.CreateCommand();
+                        cmd.CommandText = @"
+                        INSERT OR IGNORE INTO ProfessoriClassi (CodiceProfessore, ClasseNome)
+                        VALUES (@codice, @classe);";
+                        cmd.Parameters.AddWithValue("@codice", p.CodiceProfessore);
+                        cmd.Parameters.AddWithValue("@classe", cl.Nome);
+                        cmd.ExecuteNonQuery();
+                    }
                 }
 
                 // Inserimento Materie

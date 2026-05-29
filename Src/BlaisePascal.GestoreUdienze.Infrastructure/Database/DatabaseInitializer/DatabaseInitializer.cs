@@ -21,16 +21,8 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.DatabaseInitialize
             ProfessoreRepository.SvuotaTabella(); // Il professore si svuota PER ULTIMO perché Classi e Materie hanno FK che puntano a Professori
 
             // FASE 3: SALVATAGGIO DATI (Usa "dati." invece di "DatiImportatiDto.")
-            // ORDINE CORRETTO: Prima il padre, poi i figli
-            // TODO: DatiImportatiDto non è presente nel progetto. Ripristinare quando sarà disponibile.
-            
-            /*
-            ProfessoreRepository.SalvaProfessori(DatiImportatiDto.Professori);
-            AulaRepository.SalvaAule(DatiImportatiDto.Aule);
-            ClasseRepository.SalvaClassi(DatiImportatiDto.Classi);
-            MateriaRepository.SalvaMaterie(DatiImportatiDto.Materie);
-            OrarioTurniRepository.SalvaOrarioTurni(DatiImportatiDto.OrariTurni);
-            */
+            // TODO: Se un giorno i dati verranno salvati da un DTO unificato, inserire la logica qui
+            // rispettando l'ordine corretto (prima Professori, poi Aule, poi Classi, Materie e OrariTurni).
             
         }
     }

@@ -28,7 +28,7 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             command.ExecuteNonQuery();
         }
 
-        public static OrarioTurni LeggiOrarioTurni(int id)
+        public static OrarioTurni? LeggiOrarioTurni(int id)
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();

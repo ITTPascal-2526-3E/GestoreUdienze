@@ -1,22 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlaisePascal.GestoreUdienze.Domain.Models;
+using BlaisePascal.GestoreUdienze.Domain.Algorithmic;
 
 namespace BlaisePascal.GestoreUdienze.Domain.Services
 {
     /// <summary>
-    /// Algoritmo GRASP semplificato per la distribuzione delle classi nei turni.
+    /// Algoritmo principale per la distribuzione delle classi nei turni.
+    /// Utilizza un approccio combinato: prima un Genetic Algorithm, poi se necessario GRASP.
     ///
-    /// Logica:
-    /// 1. Separa le classi in Automazione (giornate 3-4) e Informatica (giornate 1-2)
-    /// 2. Mescola casualmente l'ordine delle classi in ciascun gruppo
-    /// 3. Assegna ogni classe al turno con penalità minima (a parità: turno meno affollato)
-    /// 4. Ripete <iterations> volte e restituisce la soluzione migliore
-    ///
-    /// Score = (conflitti × 100) + (penalità prossimità × 1)
+    /// Score = (conflitti * 100) + (penalita' prossimita' * 1)
     /// </summary>
     public class SchedulingService
     {
@@ -36,21 +32,28 @@ namespace BlaisePascal.GestoreUdienze.Domain.Services
         }
 
         /// <summary>
-        /// Genera il miglior piano di scheduling trovato in <iterations> tentativi.
+        /// Genera il miglior piano di scheduling trovato.
         /// </summary>
         public PianoScheduling Genera(IEnumerable<Professore> professori, int iterations = 200)
         {
             var profList = professori.ToList();
 
-            // Estrai tutte le classi distinte e dividile per gruppo
-            var tutteLeClassi = _groupingService.EstraiClassiDistinte(profList).ToList();
-            var classiInformatica = _groupingService
-                .FiltraPerGruppo(tutteLeClassi, GruppoSezione.Informatica).ToList();
-            var classiAutomazione = _groupingService
-                .FiltraPerGruppo(tutteLeClassi, GruppoSezione.Automazione).ToList();
+            // 1. Esegui il Genetic Algorithm
+            var geneticService = new SchedulingGeneticService(_conflictService, _groupingService, _proximityService);
+            var pianoGA = geneticService.Genera(profList);
 
-            PianoScheduling? migliore = null;
-            int migliorScore = int.MaxValue;
+            if (pianoGA.Score == 0)
+            {
+                return pianoGA;
+            }
+
+            // 2. Fallback: Esegui GRASP veloce se GA non ha trovato soluzione perfetta
+            var tutteLeClassi = _groupingService.EstraiClassiDistinte(profList).ToList();
+            var classiInformatica = _groupingService.FiltraPerGruppo(tutteLeClassi, GruppoSezione.Informatica).ToList();
+            var classiAutomazione = _groupingService.FiltraPerGruppo(tutteLeClassi, GruppoSezione.Automazione).ToList();
+
+            PianoScheduling? migliore = pianoGA;
+            int migliorScore = pianoGA.Score;
 
             for (int iter = 0; iter < iterations; iter++)
             {
@@ -64,7 +67,6 @@ namespace BlaisePascal.GestoreUdienze.Domain.Services
                     migliore = piano;
                 }
 
-                // Soluzione perfetta trovata: fermati subito
                 if (score == 0) break;
             }
 
@@ -78,7 +80,6 @@ namespace BlaisePascal.GestoreUdienze.Domain.Services
         {
             var piano = PianoScheduling.Inizializza();
 
-            // Giornate 1-2 per Informatica, giornate 3-4 per Automazione
             AssegnaGruppo(piano, Mescola(classiInformatica), GruppoSezione.Informatica, professori);
             AssegnaGruppo(piano, Mescola(classiAutomazione), GruppoSezione.Automazione, professori);
 
@@ -95,7 +96,6 @@ namespace BlaisePascal.GestoreUdienze.Domain.Services
 
             foreach (var classe in classi)
             {
-                // Trova il turno con penalità minima, a parità scegli il meno affollato
                 Turno? migliore = null;
                 int miglioriPenalita = int.MaxValue;
                 int miglioreAffollamento = int.MaxValue;
@@ -138,4 +138,3 @@ namespace BlaisePascal.GestoreUdienze.Domain.Services
         }
     }
 }
-

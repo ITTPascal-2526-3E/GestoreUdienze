@@ -13,10 +13,10 @@ namespace BlaisePascal.GestoreUdienze.Domain.Models
         public const int MaxClassi = 4;
         public const int MinClassi = 3;
 
-        public int NumeroGiornata { get; set; }   // 1–4
-        public int IndiceTurno { get; set; }      // 1–9 dentro la giornata
+        public int NumeroGiornata { get; set; }   // 1-4
+        public int IndiceTurno { get; set; }      // 1-4 dentro la giornata
 
-        /// <summary>Indice globale assoluto 1–36.</summary>
+        /// <summary>Indice globale assoluto 1-16.</summary>
         public int IndiceGlobale => (NumeroGiornata - 1) * 4 + IndiceTurno;
 
         public GruppoSezione Gruppo =>
@@ -24,7 +24,7 @@ namespace BlaisePascal.GestoreUdienze.Domain.Models
 
         public List<Classe> Classi { get; set; } = new();
 
-        // Hook Fase 2 — aule assegnate
+        // Hook Fase 2 - aule assegnate
         public List<AssegnazioneAula> AssegnazioniAule { get; set; } = new();
 
         public bool IsPieno => Classi.Count >= MaxClassi;
@@ -48,12 +48,17 @@ namespace BlaisePascal.GestoreUdienze.Domain.Models
         {
             if (IsPieno)
                 throw new InvalidOperationException(
-                    $"Turno {NumeroGiornata}-{IndiceTurno} già pieno.");
+                    $"Turno {NumeroGiornata}-{IndiceTurno} pieno.");
             Classi.Add(classe);
         }
 
         public override string ToString() =>
             $"G{NumeroGiornata}-T{IndiceTurno} [{string.Join(", ", Classi)}]";
 
+        public override bool Equals(object? obj) =>
+            obj is Turno t && NumeroGiornata == t.NumeroGiornata && IndiceTurno == t.IndiceTurno;
+
+        public override int GetHashCode() =>
+            HashCode.Combine(NumeroGiornata, IndiceTurno);
     }
 }

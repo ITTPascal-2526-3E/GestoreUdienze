@@ -19,13 +19,15 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             @"
             CREATE TABLE IF NOT EXISTS Aule (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Nome TEXT
+                Nome TEXT,
+                Ala TEXT,
+                Piano INTEGER
             );
             ";
             command.ExecuteNonQuery();
         }
 
-        public static Aula LeggiAula(int id)
+        public static Aula? LeggiAula(int id)
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();

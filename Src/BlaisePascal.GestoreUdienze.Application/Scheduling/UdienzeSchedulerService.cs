@@ -10,14 +10,8 @@ namespace BlaisePascal.GestoreUdienze.Application.Scheduling
     // Motore di schedulazione principale basato su Google OR-Tools CP-SAT.
     // Gestisce l'intera complessità del problema: turni, aule, vincoli hard (P1) e soft (P2).
     // 
-    public class UdienzeSchedulerService
+    public class UdienzeSchedulerService(int maxTimeSeconds = 300)
     {
-        private readonly int _maxTimeSeconds;
-
-        public UdienzeSchedulerService(int maxTimeSeconds = 300)
-        {
-            _maxTimeSeconds = maxTimeSeconds;
-        }
 
         public RisultatoSchedulingDto Risolvi(
             List<DocenteDto> docenti,
@@ -31,7 +25,7 @@ namespace BlaisePascal.GestoreUdienze.Application.Scheduling
             // Filtra solo docenti attivi
             var docentiAttivi = docenti.Where(d => d.Attivo).ToList();
 
-            if (!docentiAttivi.Any() || !classi.Any() || !aule.Any() || !turni.Any())
+            if (docentiAttivi.Count == 0 || classi.Count == 0 || aule.Count == 0 || turni.Count == 0)
             {
                 risultato.StatoSolver = "Infeasible";
                 risultato.Warnings.Add("Input insufficiente: verificare docenti attivi, classi, aule e turni.");
@@ -64,7 +58,7 @@ namespace BlaisePascal.GestoreUdienze.Application.Scheduling
                 }
             }
 
-            if (!udienze.Any())
+            if (udienze.Count == 0)
             {
                 risultato.StatoSolver = "Infeasible";
                 risultato.Warnings.Add("Nessuna udienza generata: nessun docente attivo insegna nelle classi fornite.");
@@ -114,7 +108,7 @@ namespace BlaisePascal.GestoreUdienze.Application.Scheduling
 
                         presenzeInAula.Add(bTandA);
                     }
-                    if (presenzeInAula.Any())
+                    if (presenzeInAula.Count > 0)
                     {
                         model.Add(LinearExpr.Sum(presenzeInAula) <= aulaObj.CapacitaMaterie);
                     }
@@ -135,7 +129,7 @@ namespace BlaisePascal.GestoreUdienze.Application.Scheduling
                     foreach (var c in classiDelDocente)
                     {
                         var key = (d.CodiceProfessore, c.Id);
-                        var serveClasse = model.NewBoolVar($"attivo_{key.Item1}_{key.Item2}_{t}");
+                        var serveClasse = model.NewBoolVar($"attivo_{d.CodiceProfessore}_{c.Id}_{t}");
                         model.Add(turno_var[key] == t).OnlyEnforceIf(serveClasse);
                         model.Add(turno_var[key] != t).OnlyEnforceIf(serveClasse.Not());
                         attivi.Add(serveClasse);
@@ -192,7 +186,7 @@ namespace BlaisePascal.GestoreUdienze.Application.Scheduling
                 var udienzeDocente = udienze
                     .Where(u => u.d.CodiceProfessore == d.CodiceProfessore)
                     .ToList();
-                if (!udienzeDocente.Any()) continue;
+                if (udienzeDocente.Count == 0) continue;
 
                 var giorniUsatiBool = new List<BoolVar>();
                 for (int g = 0; g < giorniDistinct.Count; g++)
@@ -219,7 +213,7 @@ namespace BlaisePascal.GestoreUdienze.Application.Scheduling
                         }
                     }
 
-                    if (presentiInGiorno.Any())
+                    if (presentiInGiorno.Count > 0)
                     {
                         model.Add(LinearExpr.Sum(presentiInGiorno) > 0).OnlyEnforceIf(gBool);
                         model.Add(LinearExpr.Sum(presentiInGiorno) == 0).OnlyEnforceIf(gBool.Not());
@@ -236,7 +230,7 @@ namespace BlaisePascal.GestoreUdienze.Application.Scheduling
             }
 
             // Funzione obiettivo: minimizzare la dispersione dei giorni
-            if (numGiorniDocenteList.Any())
+            if (numGiorniDocenteList.Count > 0)
             {
                 model.Minimize(LinearExpr.Sum(numGiorniDocenteList));
             }
@@ -244,7 +238,7 @@ namespace BlaisePascal.GestoreUdienze.Application.Scheduling
             // RISOLUZIONE
 
             var solver = new CpSolver();
-            solver.StringParameters = $"max_time_in_seconds: {_maxTimeSeconds}.0";
+            solver.StringParameters = $"max_time_in_seconds: {maxTimeSeconds}.0";
             var status = solver.Solve(model);
 
             sw.Stop();

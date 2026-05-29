@@ -7,7 +7,7 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
 {
     public static class ProfessoreRepository
     {
-        private static string connectionString = "Data Source=gestoreudienze.db";
+        private static readonly string connectionString = "Data Source=gestoreudienze.db";
 
         public static void CreaTabella()
         {
@@ -20,13 +20,15 @@ namespace BlaisePascal.GestoreUdienze.Infrastructure.Database.Data
             CREATE TABLE IF NOT EXISTS Professori (
                 CodiceProfessore TEXT PRIMARY KEY,
                 Nome TEXT,
-                Cognome TEXT
+                Cognome TEXT,
+                IsLaboratorio INTEGER DEFAULT 0,
+                Attivo INTEGER DEFAULT 1
             );
             ";
             command.ExecuteNonQuery();
         }
 
-        public static Professore LeggiProfessore(string codiceProfessore)
+        public static Professore? LeggiProfessore(string codiceProfessore)
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();
